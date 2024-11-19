@@ -1,99 +1,130 @@
-//ecm.cpp
 #include "ecm.h"
-#include <SFML/Graphics/Shape.hpp>
-#include <iostream>
 
 using namespace std;
-using namespace sf;
 
-// Define Entity constructor with initial values
-Entity::Entity() : _position(0, 0), _rotation(0), _alive(true), _visible(true), _fordeletion(false) {}
+Entity::Entity(Scene* const s)
+    : _position({0, 0}), _rotation(0), _alive(true), _visible(true),
+      scene(s), _fordeletion(false) {}
 
-// Destructor
-Entity::~Entity() {}
+void Entity::addTag(const std::string& t) { _tags.insert(t); }
+const std::set<std::string>& Entity::getTags() const { return _tags; }
 
-// Getter for position
-const Vector2f& Entity::getPosition() const {
-    return _position;
-}
-
-// Setter for position
-void Entity::setPosition(const Vector2f& pos) {
-    _position = pos;
-}
-
-// Getter for rotation
-float Entity::getRotation() const {
-    return _rotation;
-}
-
-// Setter for rotation
-void Entity::setRotation(float rotation) {
-    _rotation = rotation;
-}
-
-// Getter for alive status
-bool Entity::isAlive() const {
-    return _alive;
-}
-
-// Setter for alive status
-void Entity::setAlive(bool alive) {
-    _alive = alive;
-}
-
-// Set entity to be deleted
-void Entity::setForDelete() {
-    _fordeletion = true;
-}
-
-// Check if entity is marked for deletion
-bool Entity::is_fordeletion() const {
-    return _fordeletion;
-}
-
-// Check if entity is visible
-bool Entity::isVisible() const {
-    return _visible;
-}
-
-// Setter for visibility
-void Entity::setVisible(bool visible) {
-    _visible = visible;
-}
-
-// Update function that calls update on each component
 void Entity::update(double dt) {
-    if (_components.empty()) {
-        std::cout << "No components to update!" << std::endl;
+  if (!_alive) {
+    return;
+  }
+  for (size_t i = 0; i < _components.size(); i++) {
+    if (_components[i]->is_fordeletion()) {
+      _components.erase(_components.begin() + i);
+      --i;
     }
-    for (const auto& component : _components) {
-        if (component) {
-            component->update(dt);
-        }
-        else {
-            std::cout << "Null component found!" << std::endl;
-        }
-    }
+    _components[i]->update(dt);
+  }
 }
 
+bool Entity::is_fordeletion() const { return _fordeletion; }
 
-// Render function that checks visibility and renders each component
 void Entity::render() {
-    if (_visible) {  // Check if the entity is visible
-        for (const auto& component : _components) {
-            component->render();  // Render each component
-        }
-    }
+  if (!_visible) {
+    return;
+  }
+  for (auto& c : _components) {
+    c->render();
+  }
 }
 
-// Component constructor that initializes the _parent and sets _fordeletion to false
+const sf::Vector2f& Entity::getPosition() const { return _position; }
+
+void Entity::setPosition(const sf::Vector2f& _position) {
+  Entity::_position = _position;
+}
+
+float Entity::getRotation() const { return _rotation; }
+
+void Entity::setRotation(float _rotation) { Entity::_rotation = _rotation; }
+
+bool Entity::isAlive() const { return _alive; }
+
+void Entity::setAlive(bool _alive) { Entity::_alive = _alive; }
+
+void Entity::setForDelete() {
+  _fordeletion = true;
+  _alive = false;
+  _visible = false;
+}
+
+bool Entity::isVisible() const { return _visible; }
+
+void Entity::setVisible(bool _visible) { Entity::_visible = _visible; }
+
 Component::Component(Entity* const p) : _parent(p), _fordeletion(false) {}
 
-// Destructor
+Entity::~Entity() {
+  // Components can inter-depend on each other, so deleting them may take
+  // multiple passes. We Keep deleting components until we can't delete any
+  // more
+  int deli = 0;
+  while (deli != _components.size()) {
+    deli = _components.size();
+    _components.erase(
+        remove_if(_components.begin(), _components.end(),
+                  [](auto& sp) { return (sp.use_count() <= 1); }),
+        _components.end());
+  }
+
+  if (_components.size() > 0) {
+    throw std::runtime_error(
+        "Can't delete entity, someone is grabbing a component!");
+  }
+
+  _components.clear();
+}
+
 Component::~Component() {}
 
-// Check if the component is marked for deletion
-bool Component::is_fordeletion() const {
-    return _fordeletion;
+bool Component::is_fordeletion() const { return _fordeletion; }
+
+void EntityManager::update(double dt) {
+  for (size_t i = 0; i < list.size(); i++) {
+    if (list[i]->is_fordeletion()) {
+      list.erase(list.begin() + i);
+      --i;
+      continue;
+    }
+    if (list[i]->_alive) {
+      list[i]->update(dt);
+    }
+  }
+}
+
+void EntityManager::render() {
+  for (auto& e : list) {
+    if (e->_visible) {
+      e->render();
+    }
+  }
+}
+
+vector<shared_ptr<Entity>> EntityManager::find(const string& tag) const {
+  vector<shared_ptr<Entity>> ret;
+  for (auto& e : list) {
+    const auto tgs = e->_tags;
+    if (tgs.find(tag) != tgs.end()) {
+      ret.push_back(e);
+    }
+  }
+  return ret;
+}
+
+vector<shared_ptr<Entity>>
+EntityManager::find(const vector<string>& tags) const {
+  vector<shared_ptr<Entity>> ret;
+  for (auto& e : list) {
+    const auto tgs = e->_tags;
+    if (any_of(tags.begin(), tags.end(),
+               [&tgs](auto t) { return tgs.find(t) != tgs.end(); })) {
+      ret.push_back(e);
+    }
+  }
+  return ret;
 }
