@@ -59,15 +59,11 @@ target_link_libraries(lib_engine lib_tile_level_loader lib_maths lib_ecm Box2D s
 file(GLOB_RECURSE SOURCES Holiday_Havoc/*.cpp Holiday_Havoc/*.h)
 file(GLOB_RECURSE CMPNTS Holiday_Havoc/components/*.cpp Holiday_Havoc/components/*.h)
 file(GLOB_RECURSE SCENES Holiday_Havoc/scenes/*.cpp Holiday_Havoc/scenes/*.h)
-add_executable(HOLIDAY_HAVOC ${SOURCES} ${RESOURCE_FILES})
-source_group("components" FILES ${CMPNTS})
-source_group("resources" FILES ${RESOURCE_FILES})
+add_executable(HOLIDAY_HAVOC ${SOURCES} ${CMPNTS} ${SCENES} ${RESOURCE_FILES})
 #target_include_directories(HOLIDAY_HAVOC SYSTEM PRIVATE ${SFML_INCS} ${B2D_INCS})
 target_link_libraries(HOLIDAY_HAVOC lib_engine)
 set(EXECUTABLES ${EXECUTABLES} HOLIDAY_HAVOC)
-
 add_dependencies(HOLIDAY_HAVOC copy_resources)
-
 set_target_properties(HOLIDAY_HAVOC 
     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)
