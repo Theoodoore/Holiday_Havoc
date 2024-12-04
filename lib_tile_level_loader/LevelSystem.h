@@ -35,6 +35,8 @@ public:
 
     static size_t getHeight();
 
+    static bool isWall(const sf::Vector2<size_t>& position);
+
     static sf::Vector2f getTilePosition(sf::Vector2<size_t>);
 
     static std::vector<sf::Vector2<size_t>> findTiles(Tile);

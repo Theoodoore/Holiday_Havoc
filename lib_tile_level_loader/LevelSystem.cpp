@@ -187,6 +187,16 @@ void LevelSystem::render(RenderWindow& window) {
     }
 }
 
+bool LevelSystem::isWall(const sf::Vector2<size_t>& position) {
+    // Ensure the position is within the bounds of the grid
+    if (position.x >= _width || position.y >= _height) {
+        return false; // Out of bounds is not a wall
+    }
+
+    // Check if the tile at the position is a wall
+    return getTile(position) == WALL;
+}
+
 LevelSystem::Tile LevelSystem::getTile(sf::Vector2<size_t> p) {
     if (p.x > _width || p.y > _height) {
         throw string("Tile out of range: ") + to_string(p.x) + "," +

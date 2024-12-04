@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include "../components/cmp_popup.h"
+#include "../components/cmp_texture_render.h"
 
 using namespace std;
 using namespace sf;
@@ -33,10 +34,17 @@ void LevelScene::Load() {
   );
   popup->setPosition(sf::Vector2f(Engine::getWindowSize().x / 2.f - 200, Engine::getWindowSize().y / 2.f - 75));
   popup->show();
+
+  auto enemy = makeEntity();
+  enemy->setPosition(sf::Vector2f(300.f, 300.f));
+  enemy->addComponent<TextureRenderComponent>("res/textures/enemy.png");
+  
+
+
   
   cout << " Scene 1 Load Done" << endl;
 
-  setLoaded(true);
+
 }
 
 void LevelScene::UnLoad() {
