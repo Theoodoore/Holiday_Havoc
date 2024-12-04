@@ -1,18 +1,11 @@
 #include "cmp_movement.h"
-#include "cmp_pathfindingManager.h"
 
 MovementComponent::MovementComponent(Entity* parent, float initialSpeed)
     : Component(parent), speed(initialSpeed), currentTargetIndex(0) {}
 
-
-void MovementComponent::setPathAStar(const sf::Vector2<size_t>& start, const sf::Vector2<size_t>& goal) {
-    path = findPathAStar(
-        start,
-        goal,
-        [](const sf::Vector2<size_t>& pos) {
-            return LevelSystem::getTileAt(LevelSystem::getTilePosition(pos)) == LevelSystem::WALL;
-        });
-    currentTargetIndex = 0;
+void MovementComponent::setPath(const std::vector<sf::Vector2<size_t>>& newPath) {
+    path = newPath;
+    currentTargetIndex = 0; // Start at the beginning of the new path
 }
 
 void MovementComponent::moveToNext(double dt) {
@@ -23,33 +16,28 @@ void MovementComponent::moveToNext(double dt) {
     // Get the current position of the entity
     sf::Vector2f currentPosition = _parent->getPosition();
 
-    // Check for obstacles dynamically
-    sf::Vector2<size_t> currentTile = path[currentTargetIndex];
-    if (LevelSystem::getTileAt(LevelSystem::getTilePosition(currentTile)) == LevelSystem::WALL) {
-        // Recalculate path if blocked
-        setPathAStar(LevelSystem::getTilePosition(currentPosition), path.back());
-        return;
-    }
+    // Get the target tile position
+    sf::Vector2f targetPosition = ls::getTilePosition(path[currentTargetIndex]);
 
-    // Move logic remains the same
-    sf::Vector2f targetPosition = ls::getTilePosition(currentTile);
+    // Calculate the direction vector
     sf::Vector2f direction = targetPosition - currentPosition;
     float distanceToTarget = sqrt(direction.x * direction.x + direction.y * direction.y);
 
+    // Normalize the direction
     if (distanceToTarget > 0) {
         direction /= distanceToTarget;
     }
 
+    // Move the entity closer to the target based on speed and time
     float step = speed * static_cast<float>(dt);
     if (distanceToTarget <= step) {
-        _parent->setPosition(targetPosition);
-        currentTargetIndex++;
+        _parent->setPosition(targetPosition); // Snap to the target
+        currentTargetIndex++; // Advance to the next tile
     }
     else {
         _parent->setPosition(currentPosition + direction * step);
     }
 }
-
 
 
 void MovementComponent::update(double dt) {
