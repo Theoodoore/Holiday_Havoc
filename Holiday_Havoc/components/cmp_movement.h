@@ -5,14 +5,14 @@
 
 class MovementComponent : public Component {
 private:
-    float speed;                        
+    float speed;                       
     std::vector<sf::Vector2<size_t>> path;
     size_t currentTargetIndex;           
 
 public:
     MovementComponent(Entity* parent, float initialSpeed);
 
-    void setPathAStar(const sf::Vector2<size_t>& start, const sf::Vector2<size_t>& goal);
+    void setPath(const std::vector<sf::Vector2<size_t>>& newPath);
     void moveToNext(double dt);
 
     virtual void update(double dt) override;
