@@ -1,14 +1,21 @@
 #include "cmp_movement.h"
 
 MovementComponent::MovementComponent(Entity* parent, float initialSpeed)
-    : Component(parent), speed(initialSpeed), currentTargetIndex(0) {}
+    : Component(parent) {
+    speed = initialSpeed;
+    currentTargetIndex = 0;
+}
 
 void MovementComponent::setPath(const std::vector<sf::Vector2<size_t>>& newPath) {
     path = newPath;
-    currentTargetIndex = 0; // Start at the beginning of the new path
+    currentTargetIndex = 0; 
 }
 
 void MovementComponent::moveToNext(double dt) {
+    if (!_parent->isAlive()) {
+        return;
+    }
+    /*
     if (currentTargetIndex >= path.size()) {
         return; // Path is complete
     }
@@ -36,8 +43,19 @@ void MovementComponent::moveToNext(double dt) {
     }
     else {
         _parent->setPosition(currentPosition + direction * step);
-    }
+    }*/
+
+    sf::Vector2f direction(-1.f, 0.f); 
+
+    direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+    sf::Vector2f movement = direction * speed * static_cast<float>(dt);
+
+    sf::Vector2f newPosition = _parent->getPosition() + movement;
+
+    _parent->setPosition(newPosition);
 }
+
 
 
 void MovementComponent::update(double dt) {

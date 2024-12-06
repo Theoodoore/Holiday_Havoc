@@ -21,12 +21,10 @@ std::vector<std::shared_ptr<Entity>> AttackComponent::getTargetsInRange() const 
     std::vector<std::shared_ptr<Entity>> targets;
     auto parentPos = _parent->getPosition();
 
-    // Get all entities from the EntityManager
-    auto entities = _entityManager.list; // Assuming 'list' is public in EntityManager
+    auto entities = _entityManager.list; 
     for (auto& entity : entities) {
-        if (entity.get() == _parent) continue; // Skip self
+        if (entity.get() == _parent) continue;
 
-        // Check distance
         auto targetPos = entity->getPosition();
         float distance = std::sqrt(std::pow(targetPos.x - parentPos.x, 2) +
             std::pow(targetPos.y - parentPos.y, 2));
