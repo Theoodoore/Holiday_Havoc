@@ -9,11 +9,13 @@
 #include <iostream>
 
 
-class DistanceDecision : public Decision
+class DistanceDecision : public MultiDecision
 {
 private:
     sf::Vector2f _target;
     float _distance;
+
+
 
     // Check if the enemy's next position is blocked by a wall
     bool isPathBlocked(Entity* owner)
@@ -37,28 +39,38 @@ private:
         return false;
     }
 
+public:
+    DistanceDecision(sf::Vector2f target, float distance,
+        std::shared_ptr<DecisionTreeNode> roamingNode,
+        std::shared_ptr<DecisionTreeNode> rotatingNode,
+        std::shared_ptr<DecisionTreeNode> attackingNode)
+        : _target(target), _distance(distance),
+        MultiDecision({ roamingNode, rotatingNode, attackingNode }) {}
+
 protected:
     std::shared_ptr<DecisionTreeNode> getBranch(Entity* owner) final
     {
 
-
+        sf::Vector2f position = owner->getPosition();
+        float distanceToTarget = std::sqrt(std::pow(position.x - _target.x, 2) + std::pow(position.y - _target.y, 2));
         // If the enemy is close enough to the target and there are no walls in the way, roam
         if (isPathBlocked(owner))
         {
-            std::cout << "A WALL" << std::endl;
-            return _falseNode;
+
+            return _childNodes[1];
              // Roam
         }
-        else
+        else if (distanceToTarget <= _distance)
         {
-           // std::cout << "rotating" << std::endl;
-            return _trueNode;  // Rotate (if path is blocked or distance is too far)
+            
+            return _childNodes[2];  // Rotate (if path is blocked or distance is too far)
+        }
+        else {
+            return _childNodes[0];
+
         }
     }
 
-public:
-    DistanceDecision(sf::Vector2f target, float distance, std::shared_ptr<DecisionTreeNode> trueNode, std::shared_ptr<DecisionTreeNode> falseNode)
-        : _target(target), _distance(distance), Decision(trueNode, falseNode) { }
 };
 
 
@@ -86,5 +98,14 @@ public:
     void makeDecision(Entity *owner) final {
         auto sm = owner->get_components<StateMachineComponent>();
         sm[0]->changeState("rotating");
+    }
+};
+
+class AtEndDecision : public DecisionTreeNode {
+public:
+    void makeDecision(Entity* owner) final {
+        auto sm = owner->get_components<StateMachineComponent>();
+        sm[0]->changeState("attacking");
+        
     }
 };

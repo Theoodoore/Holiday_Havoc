@@ -3,6 +3,7 @@
 
 #include "steering.h"
 #include "../components/cmp_state_machine.h"
+#include "../components/cmp_attack.h"
 #include "LevelSystem.h"
 
 
@@ -39,4 +40,18 @@ public:
             200.0f) {}
 
     void execute(Entity*, double) noexcept override;
+};
+
+
+class AttackingState : public State {
+private:
+    std::chrono::steady_clock::time_point lastAttackTime;
+
+public:
+    AttackingState(std::shared_ptr<Entity> owner) : lastAttackTime(std::chrono::steady_clock::now()) {}
+    
+         
+
+    void execute(Entity* owner, double dt) noexcept override;
+    
 };

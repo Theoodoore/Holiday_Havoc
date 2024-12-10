@@ -7,7 +7,7 @@
 #include "../components/cmp_texture_render.h"
 #include "../components/cmp_movement.h"
 #include "../components/cmp_health.h"
-#include "../components/cmp_sprite.h"
+#include "../components/cmp_attack.h"
 #include "../components/cmp_basic_movement.h"
 #include "../components/steering_states.h"
 #include "../components/cmp_decision_tree.h"
@@ -21,6 +21,7 @@ using namespace sf;
 
 static std::shared_ptr<PopupComponent> popup;
 shared_ptr<Entity> enemy;
+shared_ptr<Entity> hauntedHouse;
 
 
 void LevelScene::Load() {
@@ -46,26 +47,34 @@ void LevelScene::Load() {
   popup->setPosition(sf::Vector2f(Engine::getWindowSize().x / 2.f - 200, Engine::getWindowSize().y / 2.f - 75));
   popup->show();
 
+  hauntedHouse = makeEntity();
+  hauntedHouse->addComponent<HealthComponent>(100); // Assuming 100 is the max health
+  sf::Vector2<size_t> endIndex = LevelSystem::findTiles(LevelSystem::END)[0];
+  sf::Vector2f endPos = LevelSystem::getTilePosition(endIndex);
+  hauntedHouse->addTag("hauntedHouse");
+
+  hauntedHouse->setPosition(endPos); 
+ 
+
   // Create enemy entity
   enemy = makeEntity();
   enemy->addComponent<TextureRenderComponent>("res/img/spritesheet.png");
   enemy->addComponent<HealthComponent>(100);
   enemy->addComponent<MovementComponent>(sf::Vector2f(-1.0f, 0.0f));
+  enemy->addComponent<AttackComponent>(10, 1.5f, ents);
 
   auto sm = enemy->addComponent<StateMachineComponent>();
   sm->addState("stationary", make_shared<StationaryState>());
   sm->addState("roaming", make_shared<RoamingState>(enemy));
   sm->addState("rotating", make_shared<RotatingState>(enemy));
-
-
-  sf::Vector2<size_t> endIndex = LevelSystem::findTiles(LevelSystem::END)[0];
-  sf::Vector2f endPos = LevelSystem::getTilePosition(endIndex);
+  sm->addState("attacking", make_shared<AttackingState>(enemy));
 
   // Create decision tree
   auto decision = make_shared<DistanceDecision>(
-      endPos, 100.0f,
+      endPos, 10.0f,
       make_shared<RoamingDecision>(), // If close to the START tile, roam towards it
-      make_shared<RotatingDecision>() // Otherwise, rotate
+      make_shared<RotatingDecision>(),
+      make_shared<AtEndDecision>()// Otherwise, rotate
   );
 
   enemy->addComponent<DecisionTreeComponent>(decision);
