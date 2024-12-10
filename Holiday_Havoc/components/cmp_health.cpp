@@ -10,8 +10,11 @@ void HealthComponent::update(double dt) {
 
 void HealthComponent::takeDamage(int amount) {
     if (!_alive) return;
+    std::cout << _health << std::endl;
 
     _health -= amount;
+
+    std::cout << _health << std::endl;
     if (_health <= 0) {
         _health = 0;
         _alive = false;

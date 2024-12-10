@@ -27,15 +27,29 @@ std::unique_ptr<LevelSystem::Tile[]> LevelSystem::_tiles;
 size_t LevelSystem::_width;
 size_t LevelSystem::_height;
 
+
+sf::Texture LevelSystem::_spriteSheet;
+std::map<LevelSystem::Tile, sf::IntRect> LevelSystem::_spriteRects;
+
 float LevelSystem::_tileSize(500.f);
 Vector2f LevelSystem::_offset(0.0f, 0.0f);
 // Vector2f LevelSystem::_offset(0,0);
 vector<std::unique_ptr<sf::RectangleShape>> LevelSystem::_sprites;
+vector<std::unique_ptr<sf::Sprite>> LevelSystem::_spriteTiles;
 
 void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
     _tileSize = tileSize;
     size_t w = 0, h = 0;
     string buffer;
+
+    if (!_spriteSheet.loadFromFile("res/img/spritesheet.png")) {
+        throw std::runtime_error("Failed to load sprite sheet!");
+    }
+
+    // Define the texture rectangle for the wall sprite
+    _spriteRects[WALL] = sf::IntRect(0, 0, 16, 16);
+    _spriteRects[EMPTY] = sf::IntRect(128, 0, 16, 16);
+    _spriteRects[END] = sf::IntRect(144, 0, 16, 16);
 
     // Load in file to buffer
     ifstream f(path);
@@ -84,6 +98,7 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
 
 void LevelSystem::buildSprites(bool optimise) {
     _sprites.clear();
+    _spriteTiles.clear();
 
     struct tp {
         sf::Vector2f p;
@@ -95,11 +110,35 @@ void LevelSystem::buildSprites(bool optimise) {
     for (size_t y = 0; y < _height; ++y) {
         for (size_t x = 0; x < _width; ++x) {
             Tile t = getTile({ x, y });
-            if (t == EMPTY) {
-                tps.push_back({ getTilePosition({x, y}), tls, sf::Color(255, 102, 102) });
+            auto pos = getTilePosition({ x, y });
+
+            if (t == WALL) {
+                // Create a sprite for wall tiles
+                auto wallSprite = std::make_unique<sf::Sprite>();
+                wallSprite->setTexture(_spriteSheet);                     // Use the loaded texture
+                wallSprite->setTextureRect(_spriteRects[WALL]);          // Sub-rectangle for the wall
+                wallSprite->setScale(_tileSize / 16.f, _tileSize / 16.f); // Scale to fit tile size
+                wallSprite->setPosition(pos);                             // Set position
+                _spriteTiles.push_back(move(wallSprite));
             }
-            else {
-                tps.push_back({ getTilePosition({x, y}), tls, getColor(t) });
+            if (t == END) {
+                // Create a sprite for wall tiles
+                auto wallSprite = std::make_unique<sf::Sprite>();
+                wallSprite->setTexture(_spriteSheet);                     // Use the loaded texture
+                wallSprite->setTextureRect(_spriteRects[END]);          // Sub-rectangle for the wall
+                wallSprite->setScale(_tileSize / 16.f, _tileSize / 16.f); // Scale to fit tile size
+                wallSprite->setPosition(pos);                             // Set position
+                _spriteTiles.push_back(move(wallSprite));
+            }
+            if (t == EMPTY || t == START ||t == WAYPOINT || t == ENEMY) {
+                // Create a sprite for wall tiles
+                auto wallSprite = std::make_unique<sf::Sprite>();
+                wallSprite->setTexture(_spriteSheet);                     // Use the loaded texture
+                wallSprite->setTextureRect(_spriteRects[EMPTY]);          // Sub-rectangle for the wall
+                wallSprite->setScale(_tileSize / 16.f, _tileSize / 16.f); // Scale to fit tile size
+                wallSprite->setPosition(pos);                             // Set position
+                _spriteTiles.push_back(move(wallSprite));
+
             }
         }
     }
@@ -183,6 +222,9 @@ void LevelSystem::buildSprites(bool optimise) {
 
 void LevelSystem::render(RenderWindow& window) {
     for (auto& t : _sprites) {
+        window.draw(*t);
+    }
+    for (auto& t : _spriteTiles) {
         window.draw(*t);
     }
 }

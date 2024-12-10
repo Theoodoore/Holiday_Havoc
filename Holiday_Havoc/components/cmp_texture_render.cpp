@@ -33,7 +33,7 @@ void TextureRenderComponent::setTexture(const std::string& texturePath) {
     if (_texture.loadFromFile(texturePath)) {
         _sprite.setTexture(_texture);
 
-        _sprite.setTextureRect(sf::IntRect(0, 16, 16, 16)); 
+        _sprite.setTextureRect(sf::IntRect(0, 64, 16, 16)); 
 
         _sprite.setOrigin(8.f, 8.f);  
 

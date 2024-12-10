@@ -8,6 +8,7 @@
 
 #define ls LevelSystem
 
+
 class LevelSystem {
 public:
     static void loadLevelFile(const std::string&, float tileSize = 100.0f);
@@ -51,6 +52,10 @@ public:
 
     static float getTileSize();
 
+    static sf::Texture _spriteSheet;
+    static std::map<Tile, sf::IntRect> _spriteRects;
+
+
 protected:
     static std::unique_ptr<Tile[]> _tiles;
     static size_t _width;
@@ -58,6 +63,7 @@ protected:
     static sf::Vector2f _offset;
 
     static std::vector<std::unique_ptr<sf::RectangleShape>> _sprites;
+    static std::vector<std::unique_ptr<sf::Sprite>> _spriteTiles;
 
     static void buildSprites(bool optimise = true);
 
