@@ -6,7 +6,8 @@ Entity::Entity(Scene* const s)
     : _position({0, 0}), _rotation(0), _alive(true), _visible(true),
       scene(s), _fordeletion(false) {}
 
-void Entity::addTag(const std::string& t) { _tags.insert(t); }
+void Entity::addTag(const std::string& t) { _tags.insert(t); std::cout << "Tag added: " << t << std::endl;
+}
 const std::set<std::string>& Entity::getTags() const { return _tags; }
 
 void Entity::update(double dt) {
@@ -105,18 +106,21 @@ void EntityManager::render() {
   }
 }
 
-vector<shared_ptr<Entity>> EntityManager::find(const string& tag) const {
+vector<shared_ptr<Entity>> EntityManager::find(const string& tag) {
   vector<shared_ptr<Entity>> ret;
+
   for (auto& e : list) {
     const auto tgs = e->_tags;
-    if (tgs.find(tag) != tgs.end()) {
-      ret.push_back(e);
+    for (const auto& t : tgs) {
+        if (t == tag) {
+            ret.push_back(e);
+        }
     }
   }
   return ret;
 }
 
-vector<shared_ptr<Entity>>
+/*vector<shared_ptr<Entity>>
 EntityManager::find(const vector<string>& tags) const {
   vector<shared_ptr<Entity>> ret;
   for (auto& e : list) {
@@ -127,4 +131,4 @@ EntityManager::find(const vector<string>& tags) const {
     }
   }
   return ret;
-}
+}*/

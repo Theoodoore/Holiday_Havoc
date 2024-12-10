@@ -1,12 +1,18 @@
 #include "cmp_attack.h"
 #include "cmp_health.h"
+#include "ecm.h"
 #include <cmath>
 #include <iostream>
+#include "engine.h"
+#include "../game.h"
+#include <LevelSystem.h>
+#include <iostream>
+#include <thread>
 
 AttackComponent::AttackComponent(Entity* p, int damage, float range, EntityManager& entityManager)
     : Component(p), _damage(damage), _range(range), _entityManager(entityManager) {}
 
-void AttackComponent::attack() {
+void AttackComponent::attackEnemies() {
     auto targets = getTargetsInRange();
 
     for (auto& target : targets) {
@@ -17,12 +23,26 @@ void AttackComponent::attack() {
     }
 }
 
+void AttackComponent::attack() {
+    auto hauntedHouses = _parent->scene->ents.find("hauntedHouse");
+   
+    if (!hauntedHouses.empty()) {
+        // Attack logic on the first hauntedHouse found
+        auto hauntedHouse = hauntedHouses[0];  // Assuming you want to attack the first one found
+        auto healthComp = hauntedHouse->get_components<HealthComponent>();
+        if (!healthComp.empty()) {
+            
+            healthComp[0]->takeDamage(10); // Attack damage
+        }
+    }
+}
+
+
 std::vector<std::shared_ptr<Entity>> AttackComponent::getTargetsInRange() const {
     std::vector<std::shared_ptr<Entity>> targets;
     auto parentPos = _parent->getPosition();
 
-    auto entities = _entityManager.list; 
-    for (auto& entity : entities) {
+    for (auto& entity : _entityManager.list) {
         if (entity.get() == _parent) continue;
 
         auto targetPos = entity->getPosition();

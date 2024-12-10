@@ -16,6 +16,7 @@ public:
     AttackComponent() = delete;
 
     void attack();
+    void attackEnemies();
     void setDamage(int damage);
     void setRange(float range);
     int getDamage() const;

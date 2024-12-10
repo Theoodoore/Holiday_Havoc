@@ -33,9 +33,9 @@ struct EntityManager {
   std::vector<std::shared_ptr<Entity>> list;
   void update(double dt);
   void render();
-  std::vector<std::shared_ptr<Entity>> find(const std::string& tag) const;
-  std::vector<std::shared_ptr<Entity>>
-  find(const std::vector<std::string>& tags) const;
+  std::vector<std::shared_ptr<Entity>> find(const std::string& tag);
+  //std::vector<std::shared_ptr<Entity>>
+ // find(const std::vector<std::string>& tags) const;
 };
 
 class Entity {
@@ -48,11 +48,12 @@ protected:
   bool _alive;       // should be updated
   bool _visible;     // should be rendered
   bool _fordeletion; // should be deleted
-  std::set<std::string> _tags;
+  
 
 public:
   void addTag(const std::string& t);
   const std::set<std::string>& getTags() const;
+  std::set<std::string> _tags;
   Scene* const scene;
   Entity(Scene* const s);
 
@@ -62,6 +63,7 @@ public:
 
   virtual void render();
 
+  std::vector<std::shared_ptr<Entity>> getList();
   
   const sf::Vector2f& getPosition() const;
 
@@ -105,7 +107,8 @@ public:
 
   // Will return a T component, or anything derived from a T component.
   template <typename T>
-  const std::vector<std::shared_ptr<T>> GetCompatibleComponent() {
+  const std::vector<std::shared_ptr<T>> GetCompatibleComponent() { 
+
     static_assert(std::is_base_of<Component, T>::value, "T != component");
     std::vector<std::shared_ptr<T>> ret;
     for (auto c : _components) {
