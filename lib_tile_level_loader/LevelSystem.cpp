@@ -266,6 +266,25 @@ std::vector<sf::Vector2<size_t>> LevelSystem::findTiles(LevelSystem::Tile type) 
     return v;
 }
 
+
+sf::Vector2<size_t> LevelSystem::getTileIndexAt(const sf::Vector2f& position) {
+    // Adjust position to account for offset
+    auto adjustedPos = position - _offset;
+    // Log adjusted position for debugging
+    // Check if the position is out of bounds
+    if (adjustedPos.x < 0 || adjustedPos.y < 0) {
+        throw std::out_of_range("Position out of bounds (negative coordinates)");
+    }
+    size_t x = static_cast<size_t>(adjustedPos.x / _tileSize);
+    size_t y = static_cast<size_t>(adjustedPos.y / _tileSize);
+    // Log calculated indices for debugging
+    if (x >= _width || y >= _height) {
+        throw std::out_of_range("Position out of range (exceeds grid dimensions)");
+    }
+    return { x, y };
+}
+
+
 LevelSystem::Tile LevelSystem::getTileAt(Vector2f v) {
     auto a = v - _offset;
     if (a.x < 0 || a.y < 0) {

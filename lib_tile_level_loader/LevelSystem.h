@@ -42,6 +42,8 @@ public:
 
     static sf::Vector2f getTilePosition(sf::Vector2<size_t>);
 
+    static sf::Vector2<size_t> getTileIndexAt(const sf::Vector2f& position);
+
     static std::vector<sf::Vector2<size_t>> findTiles(Tile);
 
     static sf::Color getColor(Tile t);
