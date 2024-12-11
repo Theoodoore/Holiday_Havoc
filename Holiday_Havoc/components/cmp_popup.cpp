@@ -1,11 +1,13 @@
 #include "cmp_popup.h"
+#include "engine.h"
 #include <system_renderer.h>
 #include <system_resources.h>
+#include "../scenes/scene_level.h"
 #include "engine.h"
 #include <iostream>
 
 PopupComponent::PopupComponent(Entity* const p, const sf::Vector2f& size, const std::string& text, unsigned int charSize)
-    : Component(nullptr), _visible(false) {
+    : Component(nullptr), _visible(false), _currentMode(Start) {
 
     // Load font for the popup
     _font = Resources::get<sf::Font>("RobotoMono-Regular.ttf");
@@ -26,15 +28,24 @@ PopupComponent::PopupComponent(Entity* const p, const sf::Vector2f& size, const 
 
 void PopupComponent::update(double dt) {
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))  
-        {
-
-            sf::Vector2i mousePos = sf::Mouse::getPosition(Engine::GetWindow());
-            if (isMouseOverCloseButton(mousePos)) {
-                hide();
-            }
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(Engine::GetWindow());
+        if (isMouseOverCloseButton(mousePos)) {
+            hide();
         }
+    }
 
+
+
+}
+
+void PopupComponent::addTowerButton(std::shared_ptr<TowerButton> button) {
+    std::cout << "added button to popup\n";
+    _towerButtons.push_back(button);
+}
+
+void PopupComponent::setMode(PopupMode mode) {
+    _currentMode = mode;
 }
 
 
@@ -43,12 +54,47 @@ bool PopupComponent::isMouseOverCloseButton(const sf::Vector2i& mousePos) const 
 }
 
 void PopupComponent::setPosition(const sf::Vector2f& pos) {
+    std::cout << "SET POPUP";
     _box.setPosition(pos);
-    _text.setPosition(pos.x + 20.f, pos.y + 20.f); // Add padding for the text
+    _text.setPosition(pos.x + 20.f, pos.y + 20.f); // Padding for the text
+
+    // Close button position
     _closeButton.setPosition(pos.x + _box.getSize().x - _closeButton.getSize().x - 10.f, pos.y + _box.getSize().y - _closeButton.getSize().y - 10.f);
-    // Ensure button position is set first before positioning text
-    _closeButtonText.setPosition(_closeButton.getPosition().x + 5.f,
-        _closeButton.getPosition().y + 5.f);
+    _closeButtonText.setPosition(_closeButton.getPosition().x + 5.f, _closeButton.getPosition().y + 5.f);
+
+    // Position tower buttons below the text area
+    float towerButtonY = pos.y + 20.f + _text.getLocalBounds().height + 20.f; // Start below the text
+
+    // Set positions for the tower buttons (make sure you reset positions first)
+    std::cout << _towerButtons.size();
+    auto index = 0;
+    for (auto& button : _towerButtons) {
+        std::cout << "POSITION OF TOWER\n";
+        // Calculate button position relative to the popup's text
+        sf::Vector2f popupPosition = getBoxPosition(); // Assuming PopupComponent provides a method to get its position
+        sf::FloatRect textBounds = getTextBounds();    // Get the bounds of the text inside the popup
+
+        float buttonX = popupPosition.x + textBounds.width + 30.f; // Place buttons to the right of the text
+        float buttonY = popupPosition.y + textBounds.top + index * 35.f - 125.0f; // Adjust button's Y position for each tower
+
+        button->setPosition(sf::Vector2f(sf::Vector2f(buttonX, buttonY))); // Position each button
+        index++;
+    }
+}
+
+
+bool PopupComponent::isMouseOverButton(const sf::RectangleShape& button) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(Engine::GetWindow());
+    return button.getGlobalBounds().contains(sf::Vector2f(mousePos));  // Check if the mouse is over the button
+}
+
+
+void PopupComponent::renderTowerButtons() {
+    // This function will render the dynamically created tower buttons
+    // You could store the created buttons as an array and iterate over them to render
+    for (auto& button : _towerButtons) {
+        button->render(Engine::GetWindow());
+    }
 }
 
 void PopupComponent::setText(const std::string& text) {
@@ -69,10 +115,19 @@ bool PopupComponent::isVisible() const {
 
 void PopupComponent::render() {
     if (_visible) {
-        Renderer::queue(&_box);  // Render the box
-        Renderer::queue(&_text); // Render the text
-        Renderer::queue(&_closeButton); // Render the close button (X)
+
+        Renderer::queue(&_box);
+        Renderer::queue(&_text);
+        Renderer::queue(&_closeButton);
         Renderer::queue(&_closeButtonText);
+
+        if (_currentMode == ShopSystem) {
+            renderTowerButtons();  // Render tower buttons when in shop system mode
+        }
+
+
+
+
     }
 }
 
@@ -82,12 +137,26 @@ void PopupComponent::createCloseButton() {
     _closeButton.setOutlineThickness(2.f);
     _closeButton.setOutlineColor(sf::Color::White);
 
-    // Set up the text inside the button
+    // Set up the text inside the button based on the current mode
     _closeButtonText.setFont(*_font);
-    _closeButtonText.setString("Start");
+    if (_currentMode == PopupMode::Start) {
+        _closeButtonText.setString("Start");  // Text for the start screen
+    }
+    else if (_currentMode == PopupMode::ShopSystem) {
+        _closeButtonText.setString("Continue");  // Text for the shop system
+    }
     _closeButtonText.setCharacterSize(24);
     _closeButtonText.setFillColor(sf::Color::White);
-
-
-
 }
+
+
+sf::Vector2f PopupComponent::getBoxPosition() const {
+    return _box.getPosition();
+}
+
+sf::FloatRect PopupComponent::getTextBounds() const {
+    return _text.getGlobalBounds();
+}
+
+
+
