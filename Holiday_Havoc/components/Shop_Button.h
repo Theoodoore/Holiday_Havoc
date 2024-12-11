@@ -1,3 +1,5 @@
+// Shop_Button.h
+
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <functional>
@@ -5,15 +7,15 @@
 
 class ShopButton : public Component {
 private:
-    sf::Texture* _spriteSheet;        // Reference to the sprite sheet
-    sf::Sprite _buttonSprite;         // The button sprite
-    sf::IntRect _staticRect;          // Rectangle for static state
-    sf::IntRect _hoverRect;           // Rectangle for hover state
-    sf::IntRect _clickRect;           // Rectangle for click state
-    std::function<void()> _onClick;   // Action to perform on click
+    sf::Texture* _spriteSheet;
+    sf::Sprite _buttonSprite;
+    sf::IntRect _staticRect;
+    sf::IntRect _hoverRect;
+    sf::IntRect _clickRect;
+    std::function<void()> _onClick;
 
-    bool _isHovered;                  // Is the mouse hovering over the button
-    bool _isClicked;                  // Is the button being clicked
+    bool _isHovered;
+    bool _isClicked;
 
 public:
     ShopButton(Entity* p, sf::Texture* spriteSheet, const sf::Vector2f& position,

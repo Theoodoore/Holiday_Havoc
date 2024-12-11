@@ -1,3 +1,5 @@
+// shop_system.h
+
 #pragma once
 #include <string>
 #include <vector>
@@ -6,27 +8,19 @@
 
 class ShopSystem {
 private:
-    // List of available towers and their prices
     std::vector<std::pair<std::shared_ptr<Tower>, int>> _availableTowers;
-
-    // Currently selected tower type
     std::shared_ptr<Tower> _selectedTower;
+    bool _shopVisible; // Keep track of if shop is visible
 
 public:
     ShopSystem();
 
-    // Add a tower to the shop with its price
     void addTower(std::shared_ptr<Tower> tower, int price);
-
-    // Display the available items in the shop
-    void displayShopItems();
-
-    // Select a tower for placement
+    void displayShopItems(const sf::Vector2f& position);
+    void toggleShopVisibility(); // Toggle shop visibility
+    bool isShopVisible() const;  // Get shop visibility
     void selectTower(int index);
-
-    // Get the currently selected tower
     std::shared_ptr<Tower> getSelectedTower() const;
-
-    // Clear the current selection
     void clearSelection();
+    const std::vector<std::pair<std::shared_ptr<Tower>, int>>& getAvailableTowers() const; // Fixed return type
 };

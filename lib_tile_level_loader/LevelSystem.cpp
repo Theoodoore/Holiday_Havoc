@@ -1,3 +1,5 @@
+// LevelSystem.cpp
+
 #include "LevelSystem.h"
 #include <fstream>
 #include <iostream>
@@ -195,23 +197,16 @@ sf::Vector2<size_t> LevelSystem::getTileIndexAt(const sf::Vector2f& position) {
     // Adjust position to account for offset
     auto adjustedPos = position - _offset;
 
-    // Log adjusted position for debugging
-    std::cout << "Adjusted Position: " << adjustedPos.x << ", " << adjustedPos.y << std::endl;
-
     // Check if the position is out of bounds
-    if (adjustedPos.x < 0 || adjustedPos.y < 0) {
-        throw std::out_of_range("Position out of bounds (negative coordinates)");
+    if (adjustedPos.x < 0 || adjustedPos.y < 0 ||
+        adjustedPos.x >= _width * _tileSize || adjustedPos.y >= _height * _tileSize) {
+        // Log out-of-bounds error
+        std::cerr << "Position out of bounds: " << adjustedPos.x << ", " << adjustedPos.y << std::endl;
+        return { static_cast<size_t>(-1), static_cast<size_t>(-1) }; // Invalid tile index
     }
 
     size_t x = static_cast<size_t>(adjustedPos.x / _tileSize);
     size_t y = static_cast<size_t>(adjustedPos.y / _tileSize);
-
-    // Log calculated indices for debugging
-    std::cout << "Tile Index: " << x << ", " << y << " (Width: " << _width << ", Height: " << _height << ")" << std::endl;
-
-    if (x >= _width || y >= _height) {
-        throw std::out_of_range("Position out of range (exceeds grid dimensions)");
-    }
 
     return { x, y };
 }

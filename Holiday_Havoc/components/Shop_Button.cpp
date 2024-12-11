@@ -1,6 +1,8 @@
+// Shop_Button.cpp
+
 #include "Shop_Button.h"
 #include "engine.h"
-#include <iostream> // For debug output
+#include <iostream> // For debug output things
 
 ShopButton::ShopButton(Entity* p, sf::Texture* spriteSheet, const sf::Vector2f& position,
     const sf::IntRect& staticRect, const sf::IntRect& hoverRect,
@@ -18,20 +20,16 @@ ShopButton::ShopButton(Entity* p, sf::Texture* spriteSheet, const sf::Vector2f& 
 
     _buttonSprite.setScale(1.f, 1.f);
 
-    // Calculate scaling to ensure the button appears at the correct size
-    const float desiredWidth = 160.0f; // Example: Desired display width
-    const float desiredHeight = 80.0f; // Example: Desired display height
+    // Calculate scaling to make sure button looks good
+    const float desiredWidth = 160.0f;
+    const float desiredHeight = 80.0f;
     float scaleX = desiredWidth / _staticRect.width;
     float scaleY = desiredHeight / _staticRect.height;
     _buttonSprite.setScale(scaleX, scaleY);
-
-    // Debug logging
-    std::cout << "ShopButton created at position (" << position.x << ", " << position.y << ") with scale ("
-        << scaleX << ", " << scaleY << ")" << std::endl;
 }
 
 void ShopButton::update(double dt) {
-    // Get the mouse position in the game window
+    // Get the mouse position
     sf::Vector2f mousePos = Engine::GetWindow().mapPixelToCoords(sf::Mouse::getPosition(Engine::GetWindow()));
     _isHovered = _buttonSprite.getGlobalBounds().contains(mousePos);
 
