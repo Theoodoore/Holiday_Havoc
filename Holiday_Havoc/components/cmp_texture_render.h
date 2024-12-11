@@ -1,3 +1,5 @@
+// texture_render.h
+
 #pragma once
 #include <ecm.h>
 #include <SFML/Graphics.hpp>
@@ -16,4 +18,7 @@ public:
 
     void render() override;
     void update(double dt) override;
+
+    // Method to change opacity (the transparency) of the sprites
+    void setOpacity(sf::Uint8 opacity);
 };

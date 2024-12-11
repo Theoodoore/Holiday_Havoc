@@ -8,7 +8,6 @@
 #include "../components/cmp_movement.h"
 #include "../components/cmp_health.h"
 #include "../components/cmp_attack.h"
-#include "../components/cmp_basic_movement.h"
 #include "../components/steering_states.h"
 #include "../components/cmp_decision_tree.h"
 #include "../components/cmp_state_machine.h"

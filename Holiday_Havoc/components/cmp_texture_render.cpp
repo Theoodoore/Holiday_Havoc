@@ -46,6 +46,13 @@ void TextureRenderComponent::setTexture(const std::string& texturePath) {
     }
 }
 
+void TextureRenderComponent::setOpacity(sf::Uint8 opacity) {
+    // Set the opacity (alpha channel) of the sprite
+    sf::Color color = _sprite.getColor();
+    color.a = opacity;  // Modify the alpha channel
+    _sprite.setColor(color);
+}
+
 void TextureRenderComponent::update(double dt) {
     _sprite.setPosition(_parent->getPosition());
     draw(Engine::GetWindow());

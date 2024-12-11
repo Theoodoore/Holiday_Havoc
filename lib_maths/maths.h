@@ -1,3 +1,5 @@
+// maths.h
+
 #pragma once
 
 #include <SFML/System.hpp>
