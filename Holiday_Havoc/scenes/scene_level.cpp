@@ -16,6 +16,7 @@
 #include "../components/cmp_shop_button.h"
 #include <random>
 #include <chrono>
+#include <SFML/Audio.hpp>
 
 using namespace std;
 using namespace sf;
@@ -94,6 +95,12 @@ void LevelScene::Load() {
     sf::Texture* spriteSheet = new sf::Texture();
     if (!spriteSheet->loadFromFile("res/img/spritesheet.png")) {
         throw std::runtime_error("Failed to load sprite sheet!");
+    }
+	
+	// Load shop button sound effect
+    sf::SoundBuffer* shopButtonSfx = new sf::SoundBuffer();
+    if (!spriteSheet->loadFromFile("res/img/342200__christopherderp__videogame-menu-button-click.wav")) {
+        throw std::runtime_error("Failed to load shop button sound effect!");
     }
 
     // Define shop button states
