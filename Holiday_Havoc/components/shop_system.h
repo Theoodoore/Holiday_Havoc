@@ -1,0 +1,32 @@
+#pragma once
+#include <string>
+#include <vector>
+#include <memory>
+#include "tower.h"
+
+class ShopSystem {
+private:
+    // List of available towers and their prices
+    std::vector<std::pair<std::shared_ptr<Tower>, int>> _availableTowers;
+
+    // Currently selected tower type
+    std::shared_ptr<Tower> _selectedTower;
+
+public:
+    ShopSystem();
+
+    // Add a tower to the shop with its price
+    void addTower(std::shared_ptr<Tower> tower, int price);
+
+    // Display the available items in the shop
+    void displayShopItems();
+
+    // Select a tower for placement
+    void selectTower(int index);
+
+    // Get the currently selected tower
+    std::shared_ptr<Tower> getSelectedTower() const;
+
+    // Clear the current selection
+    void clearSelection();
+};

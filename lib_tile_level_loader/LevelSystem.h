@@ -57,6 +57,8 @@ public:
     static sf::Texture _spriteSheet;
     static std::map<Tile, sf::IntRect> _spriteRects;
 
+    static sf::Vector2<size_t> getTileIndexAt(const sf::Vector2f& position);
+
 
 protected:
     static std::unique_ptr<Tile[]> _tiles;
