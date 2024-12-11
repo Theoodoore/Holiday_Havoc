@@ -9,6 +9,34 @@ TowerButton::TowerButton(std::shared_ptr<Tower> tower, int price, const sf::Vect
 
 }
 
+void TowerButton::setOnClickCallback(std::function<void()> callback) {
+        _onClickCallback = callback;
+}
+
+void TowerButton::onClick() {
+ 
+        if (_onClickCallback) {
+            _onClickCallback(); // Trigger the callback when clicked
+        }
+}
+
+
+bool TowerButton::isPressed() {
+    // Check if the mouse press is within the bounds of the button
+        // Get the current mouse position in world coordinates
+   
+    sf::Vector2i mousePos = sf::Mouse::getPosition(Engine::GetWindow());
+    sf::Vector2f worldPos = Engine::GetWindow().mapPixelToCoords(mousePos);
+
+    // Check if the left mouse button is pressed and the mouse is over the button
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && _button.getGlobalBounds().contains(worldPos)) {
+        return true;; // Trigger the onClick callback
+    }
+
+}
+
+
+
 void TowerButton::render(sf::RenderWindow& window) {
     Renderer::queue(&_button);
     Renderer::queue(&_buttonText);

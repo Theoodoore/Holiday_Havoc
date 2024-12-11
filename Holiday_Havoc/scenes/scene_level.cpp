@@ -57,9 +57,44 @@ void LevelScene::Load() {
     hauntedHouse->setPosition(endPos);
 
     // Create 3 enemy entities
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 2; i++) {
         auto enemy = makeEntity();
-        enemy->addComponent<TextureRenderComponent>("res/img/spritesheet.png");
+        // Example usage:
+        sf::IntRect textureRegion(0, 64, 16, 16);  // Define the texture region
+        enemy->addComponent<TextureRenderComponent>("res/img/spritesheet.png", textureRegion);
+        enemy->addComponent<HealthComponent>(100);
+
+        // Offset each enemy's starting position
+        sf::Vector2f startPos = LevelSystem::getTilePosition(LevelSystem::findTiles(LevelSystem::START)[0]);
+
+        enemy->setPosition(startPos);
+
+        enemy->addComponent<MovementComponent>(sf::Vector2f(-1.0f, 0.0f));
+        enemy->addComponent<AttackComponent>(10, 1.5f, ents);
+
+        auto sm = enemy->addComponent<StateMachineComponent>();
+        sm->addState("stationary", make_shared<StationaryState>());
+        sm->addState("roaming", make_shared<RoamingState>(enemy));
+        sm->addState("rotating", make_shared<RotatingState>(enemy));
+        sm->addState("attacking", make_shared<AttackingState>(enemy));
+
+        // Create decision tree
+        auto decision = make_shared<DistanceDecision>(
+            endPos, 10.0f,
+            make_shared<RoamingDecision>(), // If close to the START tile, roam towards it
+            make_shared<RotatingDecision>(),
+            make_shared<AtEndDecision>() // Otherwise, rotate
+        );
+
+        enemy->addComponent<DecisionTreeComponent>(decision);
+    }
+
+    // Create 3 enemy entities
+    for (int i = 0; i < 2; i++) {
+        auto enemy = makeEntity();
+        // Example usage:
+        sf::IntRect textureRegion(0, 96, 16, 16);  // Define the texture region
+        enemy->addComponent<TextureRenderComponent>("res/img/spritesheet.png", textureRegion);
         enemy->addComponent<HealthComponent>(100);
 
         // Offset each enemy's starting position
@@ -132,11 +167,19 @@ void LevelScene::UnLoad() {
 void LevelScene::Update(const double& dt) {
     if (popup->isVisible()) {
         popup->update(dt);
+        for (auto& button : popup->getTowerButtons()) {
+            if (button->isPressed()) {
+                button->onClick();  // Trigger the callback
+            }
+        }
+
            
     }
     else {
 
         Scene::Update(dt);
+
+
 
         // Get mouse position
         sf::Vector2f mousePos = Engine::GetWindow().mapPixelToCoords(sf::Mouse::getPosition(Engine::GetWindow()));
@@ -145,12 +188,14 @@ void LevelScene::Update(const double& dt) {
             try {
                 auto tileIndex = ls::getTileIndexAt(mousePos); // Get the grid position (indices) of the tile
                 auto tilePos = ls::getTilePosition(tileIndex); // Convert grid position to world position
+              //  cout << tilePos << endl;
 
                 if (!hoveringTower) {
                     // Create a hovering tower
                     hoveringTower = shopSystem.getSelectedTower();
                     if (hoveringTower) {
                         hoveringTower->setHovering(true);
+                        cout << "hoveringTrue" << endl;
                         hoveringTower->setPosition(tilePos);
                     }
                 }
@@ -159,10 +204,13 @@ void LevelScene::Update(const double& dt) {
                     hoveringTower->setPosition(tilePos);
                     // Place the tower if the left mouse button is pressed
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                        hoveringTower->setHovering(false); // Disable hover mode
-                        ents.list.push_back(hoveringTower); // Add to entity manager
-                        hoveringTower = nullptr; // Reset hovering tower
-                        shopSystem.clearSelection(); // Clear selected tower
+                        if (ls::getTileAt(tilePos) != LevelSystem::WALL) {
+                            hoveringTower->setPosition(tilePos);
+                            hoveringTower->setHovering(false); // Disable hover mode
+                            ents.list.push_back(hoveringTower); // Add to entity manager
+                               hoveringTower = nullptr; // Reset hovering tower
+                               shopSystem.clearSelection(); // Clear selected tower
+                        }
                     }
                 }
             }

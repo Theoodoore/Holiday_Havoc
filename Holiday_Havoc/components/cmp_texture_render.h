@@ -1,5 +1,3 @@
-// texture_render.h
-
 #pragma once
 #include <ecm.h>
 #include <SFML/Graphics.hpp>
@@ -10,10 +8,11 @@ protected:
     sf::Sprite _sprite;
 
 public:
-    explicit TextureRenderComponent(Entity* p, const std::string& texturePath);
+    // Updated constructor to accept texture rectangle parameter
+    explicit TextureRenderComponent(Entity* p, const std::string& texturePath, const sf::IntRect& textureRect);
     TextureRenderComponent() = delete;
 
-    void setTexture(const std::string& texturePath);
+    void setTexture(const std::string& texturePath, const sf::IntRect& textureRect);  // Updated signature
     void draw(sf::RenderWindow& window) const;
 
     void render() override;

@@ -25,6 +25,9 @@ public:
     bool isVisible() const;
     void update(double dt) override;
 
+    void clearTowerButtons();
+    std::vector<std::shared_ptr<TowerButton>>& getTowerButtons();
+
     sf::Vector2f getBoxPosition() const;
 
     sf::FloatRect getTextBounds() const;

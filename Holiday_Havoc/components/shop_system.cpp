@@ -5,16 +5,20 @@
 #include "ecm.h"
 #include "engine.h"
 
-ShopSystem::ShopSystem(std::shared_ptr<PopupComponent> popup) : _popup(popup), _selectedTower(nullptr) {}
+ShopSystem::ShopSystem(std::shared_ptr<PopupComponent> popup)
+    : _popup(popup), _selectedTower(nullptr) {}
 
 void ShopSystem::addTower(std::shared_ptr<Tower> tower, int price) {
     _availableTowers.emplace_back(tower, price);
 }
 
 void ShopSystem::selectTower(int index) {
+    std::cout << "SELECTING " << index << " for placement.\n";
     if (index > 0 && index <= _availableTowers.size()) {
         _selectedTower = _availableTowers[index - 1].first;
+        _purchasedTowers.push_back(_selectedTower); // Mark tower as purchased
         std::cout << "Selected Tower " << index << " for placement.\n";
+        updateShopButtons(); // Remove the corresponding button
     }
     else {
         std::cout << "Invalid selection.\n";
@@ -22,20 +26,46 @@ void ShopSystem::selectTower(int index) {
 }
 
 void ShopSystem::displayShopItems() {
-    std::cout << "towers ";
+    std::cout << "Displaying available towers.\n";
+
+    if (_popup) {
+        updateShopButtons(); // Update only the remaining buttons
+    }
+
     std::string towerList = "Available Towers:\n";
     for (size_t i = 0; i < _availableTowers.size(); ++i) {
+        if (std::find(_purchasedTowers.begin(), _purchasedTowers.end(), _availableTowers[i].first) != _purchasedTowers.end()) {
+            continue; // Skip already purchased towers
+        }
         towerList += std::to_string(i + 1) + ": Tower (Price: " + std::to_string(_availableTowers[i].second) + " candy)\n";
-        createTowerButton(i);  // Create a button for each tower
     }
 
     if (_popup) {
-        std::cout << "Displaying towers in popup.\n";
-        _popup->setText(towerList);  // Change button text to "Continue"
-        _popup->setPosition(sf::Vector2f(200.f, 150.f));  // Example call to position the popup
-        _popup->setMode(PopupComponent::ShopSystem);  // Set the popup mode to ShopSystem
+        _popup->setText(towerList);
+        _popup->setPosition(sf::Vector2f(200.f, 150.f));
+        _popup->setMode(PopupComponent::ShopSystem);
         _popup->show();
     }
+}
+
+void ShopSystem::updateShopButtons() {
+    if (_popup) {
+        _popup->clearTowerButtons(); // Clear existing buttons
+        for (size_t i = 0; i < _availableTowers.size(); ++i) {
+           if (std::find(_purchasedTowers.begin(), _purchasedTowers.end(), _availableTowers[i].first) != _purchasedTowers.end()) {
+               continue; // Skip purchased towers
+            }
+            createTowerButton(i); 
+        }
+    }
+}
+
+void ShopSystem::selectTowerForPlacement(std::shared_ptr<Tower> tower) {
+    _selectedTower = tower;
+    std::cout << "PURCHASED\n";
+    _purchasedTowers.push_back(tower); // Mark the tower as purchased
+    std::cout << "Selected Tower for placement.\n";
+    _popup->hide();
 }
 
 void ShopSystem::createTowerButton(int index) {
@@ -43,18 +73,20 @@ void ShopSystem::createTowerButton(int index) {
     int price = _availableTowers[index].second;
 
     if (_popup) {
-        // Calculate button position relative to the popup's text
-        sf::Vector2f popupPosition = _popup->getBoxPosition(); // Assuming PopupComponent provides a method to get its position
-        sf::FloatRect textBounds = _popup->getTextBounds();    // Get the bounds of the text inside the popup
+        sf::Vector2f popupPosition = _popup->getBoxPosition();
+        sf::FloatRect textBounds = _popup->getTextBounds();
 
-        float buttonX = popupPosition.x + textBounds.width + 70.f; // Place buttons to the right of the text
-        float buttonY = popupPosition.y + textBounds.top + index * 60.f; // Adjust button's Y position for each tower
+        float buttonX = popupPosition.x + textBounds.width + 70.f;
+        float buttonY = popupPosition.y + textBounds.top + index * 60.f;
 
         auto button = std::make_shared<TowerButton>(tower, price, sf::Vector2f(buttonX, buttonY));
-        _popup->addTowerButton(button); // Add button to the popup
+        button->setOnClickCallback([this, tower]() {
+            selectTowerForPlacement(tower);
+            });
+
+        _popup->addTowerButton(button);
     }
 }
-
 
 std::shared_ptr<Tower> ShopSystem::getSelectedTower() const {
     return _selectedTower;

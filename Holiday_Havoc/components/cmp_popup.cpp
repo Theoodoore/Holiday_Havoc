@@ -26,6 +26,11 @@ PopupComponent::PopupComponent(Entity* const p, const sf::Vector2f& size, const 
     createCloseButton();
 }
 
+std::vector<std::shared_ptr<TowerButton>>& PopupComponent::getTowerButtons() {
+    return _towerButtons;
+}
+
+
 void PopupComponent::update(double dt) {
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -34,8 +39,6 @@ void PopupComponent::update(double dt) {
             hide();
         }
     }
-
-
 
 }
 
@@ -106,8 +109,17 @@ void PopupComponent::show() {
 }
 
 void PopupComponent::hide() {
+
     _visible = false;
+    
 }
+
+void PopupComponent::clearTowerButtons() {
+    _towerButtons.clear();
+    std::cout << "Cleared all tower buttons.\n";
+}
+
+
 
 bool PopupComponent::isVisible() const {
     return _visible;
