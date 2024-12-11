@@ -11,6 +11,7 @@ private:
     std::shared_ptr<AttackComponent> _attackComponent;
     std::shared_ptr<TextureRenderComponent> _textureComponent;
     bool _isHovering;
+    int _damage;
 
 public:
     Tower(Scene* scene, const sf::Vector2f& position, int damage, float range, float attackRate);
@@ -18,4 +19,5 @@ public:
     void setHovering(bool hovering);
     void updateHoverPosition(const sf::Vector2f& position);
     void update(double dt) override;
+    int getDamage();
 };

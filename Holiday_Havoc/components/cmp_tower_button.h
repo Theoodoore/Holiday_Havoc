@@ -5,6 +5,7 @@
 #include <memory>
 #include "tower.h"  // Assuming you have a Tower class
 
+
 class TowerButton {
 public:
     // Constructor to initialize the button with a tower, price, and position
@@ -24,13 +25,20 @@ public:
     // Get the price of the tower
     int getPrice() const;
 
+    bool isPressed();
+
     sf::Vector2f getSize() const;
+
+    void setOnClickCallback(std::function<void()> callback);
+
+    void onClick();
 
 private:
     sf::RectangleShape _button;  // Visual representation of the button
     sf::Text _buttonText;       // Text to display on the button
     std::shared_ptr<Tower> _tower;  // Associated tower for this button
     int _price;  // Price of the tower
+    std::function<void()> _onClickCallback;
 
 };
 

@@ -6,7 +6,9 @@ Tower::Tower(Scene* scene, const sf::Vector2f& position, int damage, float range
     : Entity(scene), _isHovering(false) {
     setPosition(position);
     _attackComponent = addComponent<AttackComponent>(damage, range, scene->ents);
-    _textureComponent = addComponent<TextureRenderComponent>("assets/tower.png");
+    sf::IntRect textureRegion(0, 16, 16, 16);  // Define the texture region
+    _textureComponent = addComponent<TextureRenderComponent>("res/img/spritesheet.png", textureRegion);
+    _damage = damage;
 }
 
 void Tower::setHovering(bool hovering) {
@@ -23,4 +25,8 @@ void Tower::updateHoverPosition(const sf::Vector2f& position) {
 void Tower::update(double dt) {
     Entity::update(dt);
     // MAYBE: (Add logic for active towers if needed)
+}
+
+int Tower::getDamage() {
+    return _damage;
 }

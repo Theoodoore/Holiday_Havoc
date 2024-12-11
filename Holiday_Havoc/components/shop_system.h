@@ -9,6 +9,8 @@ class ShopSystem {
 private:
     // List of available towers and their prices
     std::vector<std::pair<std::shared_ptr<Tower>, int>> _availableTowers;
+    std::vector<std::shared_ptr<Tower>> _purchasedTowers;
+
 
     // Currently selected tower type
     std::shared_ptr<Tower> _selectedTower;
@@ -24,6 +26,8 @@ public:
     // Display the available items in the shop
     void displayShopItems();
 
+    void ShopSystem::updateShopButtons();
+
     void createTowerButton(int index);
 
     // Select a tower for placement
@@ -31,6 +35,8 @@ public:
 
     // Get the currently selected tower
     std::shared_ptr<Tower> getSelectedTower() const;
+
+    void selectTowerForPlacement(std::shared_ptr<Tower> tower);
 
     // Clear the current selection
     void clearSelection();
