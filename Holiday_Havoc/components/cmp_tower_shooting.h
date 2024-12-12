@@ -1,3 +1,4 @@
+/*
 #pragma once
 
 #include "ecm.h"
@@ -6,14 +7,14 @@
 
 class TowerShootingComponent : public Component {
 private:
-    float _cooldown;                // Time between shots
-    float _timeSinceLastShot;       // Timer for the cooldown
-    float _range;                   // Range of the tower
-    int _damage;                    // Damage dealt per shot
-    std::shared_ptr<Entity> _target; // Current target entity
+    float _cooldown;                
+    float _timeSinceLastShot;       
+    float _range;                   
+    int _damage;                    
+    std::shared_ptr<Entity> _target; 
 
-    void findClosestEnemy();        // Finds the closest enemy within range
-    void shootAtTarget();           // Shoots a projectile at the current target
+    void findClosestEnemy();        
+    void shootAtTarget();           
 
 public:
     TowerShootingComponent(Entity* p, float cooldown, float range, int damage);
@@ -21,3 +22,6 @@ public:
     void update(double dt) override;
     void render() override {}
 };
+*/
+
+// NO LONGER IN USE - theo
