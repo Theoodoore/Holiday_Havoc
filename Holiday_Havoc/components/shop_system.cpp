@@ -29,6 +29,7 @@ void ShopSystem::displayShopItems() {
     std::cout << "Displaying available towers.\n";
 
     if (_popup) {
+       
         updateShopButtons(); // Update only the remaining buttons
     }
 
@@ -41,9 +42,10 @@ void ShopSystem::displayShopItems() {
     }
 
     if (_popup) {
+        _popup->setMode(PopupComponent::ShopSystem);
         _popup->setText(towerList);
         _popup->setPosition(sf::Vector2f(200.f, 150.f));
-        _popup->setMode(PopupComponent::ShopSystem);
+        _popup->changeText();
         _popup->show();
     }
 }

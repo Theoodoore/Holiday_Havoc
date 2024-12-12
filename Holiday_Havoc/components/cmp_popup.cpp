@@ -6,7 +6,7 @@
 #include "engine.h"
 #include <iostream>
 
-PopupComponent::PopupComponent(Entity* const p, const sf::Vector2f& size, const std::string& text, unsigned int charSize)
+PopupComponent::PopupComponent(const sf::Vector2f& size, const std::string& text, unsigned int charSize)
     : Component(nullptr), _visible(false), _currentMode(Start) {
 
     // Load font for the popup
@@ -48,6 +48,8 @@ void PopupComponent::addTowerButton(std::shared_ptr<TowerButton> button) {
 }
 
 void PopupComponent::setMode(PopupMode mode) {
+    std::cout << "changed";
+    std::cout << mode;
     _currentMode = mode;
 }
 
@@ -57,7 +59,7 @@ bool PopupComponent::isMouseOverCloseButton(const sf::Vector2i& mousePos) const 
 }
 
 void PopupComponent::setPosition(const sf::Vector2f& pos) {
-    std::cout << "SET POPUP";
+    
     _box.setPosition(pos);
     _text.setPosition(pos.x + 20.f, pos.y + 20.f); // Padding for the text
 
@@ -72,7 +74,6 @@ void PopupComponent::setPosition(const sf::Vector2f& pos) {
     std::cout << _towerButtons.size();
     auto index = 0;
     for (auto& button : _towerButtons) {
-        std::cout << "POSITION OF TOWER\n";
         // Calculate button position relative to the popup's text
         sf::Vector2f popupPosition = getBoxPosition(); // Assuming PopupComponent provides a method to get its position
         sf::FloatRect textBounds = getTextBounds();    // Get the bounds of the text inside the popup
@@ -127,24 +128,31 @@ bool PopupComponent::isVisible() const {
 
 void PopupComponent::render() {
     if (_visible) {
-
+        // Render the popup box, text, and close button
         Renderer::queue(&_box);
-        Renderer::queue(&_text);
         Renderer::queue(&_closeButton);
         Renderer::queue(&_closeButtonText);
 
+        // Change the text based on the mode
         if (_currentMode == ShopSystem) {
-            renderTowerButtons();  // Render tower buttons when in shop system mode
+            Renderer::queue(&_text);
+            renderTowerButtons();  // Only render tower buttons in shop mode
         }
-
-
-
-
+        else if (_currentMode == Pause) {
+            // Change the text for pause mode and render it
+            _text.setString("Paused\nPress Escape to return");
+            Renderer::queue(&_text);  // Render the pause text
+        }
+        else {
+            // Default text for other modes (you can add more modes if needed)
+            Renderer::queue(&_text);
+        }
     }
 }
 
+
 void PopupComponent::createCloseButton() {
-    _closeButton.setSize(sf::Vector2f(80.f, 40.f)); // Size of the button
+    _closeButton.setSize(sf::Vector2f(130.f, 40.f)); // Size of the button
     _closeButton.setFillColor(sf::Color(0, 0, 0, 180)); // Semi-transparent black background for the button
     _closeButton.setOutlineThickness(2.f);
     _closeButton.setOutlineColor(sf::Color::White);
@@ -160,6 +168,26 @@ void PopupComponent::createCloseButton() {
     _closeButtonText.setCharacterSize(24);
     _closeButtonText.setFillColor(sf::Color::White);
 }
+
+void PopupComponent::changeText() {
+    if (_currentMode == PopupMode::Start) {
+        _closeButtonText.setString("Start");  // Text for the start screen
+    }
+    else if (_currentMode == PopupMode::ShopSystem) {
+        _closeButtonText.setString("Continue");  // Text for the shop system
+    }
+}
+
+void PopupComponent::moveTowerButtonsOffScreen() {
+    for (auto& button : _towerButtons) {
+        // Move buttons far off-screen
+        button->setPosition(sf::Vector2f(-1000.f, -1000.f));  // Move off-screen
+    }
+}
+
+
+
+
 
 
 sf::Vector2f PopupComponent::getBoxPosition() const {

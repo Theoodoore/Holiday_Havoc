@@ -12,8 +12,8 @@ class PopupComponent: public Component {
     
 public:
     PopupComponent() = delete;
-    explicit PopupComponent(Entity* p, const sf::Vector2f& size, const std::string& text, unsigned int charSize);
-    enum PopupMode { Start, ShopSystem };
+    explicit PopupComponent(const sf::Vector2f& size, const std::string& text, unsigned int charSize);
+    enum PopupMode { Start, ShopSystem, Pause };
     PopupMode _currentMode;
     void setPosition(const sf::Vector2f& pos);
     std::vector<std::shared_ptr<TowerButton>> _towerButtons;
@@ -24,6 +24,7 @@ public:
     void setMode(PopupMode mode);
     bool isVisible() const;
     void update(double dt) override;
+    void moveTowerButtonsOffScreen();
 
     void clearTowerButtons();
     std::vector<std::shared_ptr<TowerButton>>& getTowerButtons();
@@ -32,10 +33,11 @@ public:
 
     sf::FloatRect getTextBounds() const;
 
+    void PopupComponent::changeText();
+
 
     void render() override;
 
-    ~PopupComponent() override = default;
 
 protected:
     std::shared_ptr<sf::Font> _font;

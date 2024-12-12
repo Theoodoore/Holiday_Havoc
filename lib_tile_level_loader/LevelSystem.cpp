@@ -313,10 +313,15 @@ void LevelSystem::setOffset(const Vector2f& _offset) {
 void LevelSystem::unload() {
     cout << "LevelSystem unloading\n";
     _sprites.clear();
+    
     _tiles.reset();
+    
     _width = 0;
     _height = 0;
     _offset = { 0, 0 };
+    _spriteSheet = sf::Texture();
+    _spriteRects.clear();
+
 }
 
 const Vector2f& LevelSystem::getOffset() { return _offset; }
