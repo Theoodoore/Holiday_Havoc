@@ -1,14 +1,13 @@
-// cmp_tower_collision.h
+// cmp_tower_collision
 
 #pragma once
-#include "ecm.h"
+#include <ecm.h>
 
-class TowerCollisionComponent : public Component {
-protected:
-    int _damage;
-
+class TowerComponent : public Component {
 public:
-    explicit TowerCollisionComponent(Entity* p, int damage);
+    explicit TowerComponent(Entity* p);
     void update(double dt) override;
-    void render() override {}
+
+private:
+    void checkCollisions();
 };
