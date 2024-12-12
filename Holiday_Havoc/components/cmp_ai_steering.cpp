@@ -1,3 +1,5 @@
+// cmp_ai_steering.cpp
+
 #include "cmp_ai_steering.h"
 #include "engine.h"
 #include "steering.h"
@@ -61,5 +63,3 @@ void SteeringComponent::move(const sf::Vector2f& p) {
 void SteeringComponent::move(float x, float y) {
     move(Vector2f(x, y));
 }
-
-

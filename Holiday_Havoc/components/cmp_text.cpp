@@ -1,3 +1,4 @@
+// cmp_text.cpp
 #include "cmp_text.h"
 #include <system_renderer.h>
 #include <system_resources.h>

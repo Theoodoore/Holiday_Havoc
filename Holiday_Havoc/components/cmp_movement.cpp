@@ -1,3 +1,4 @@
+// cmp_movement.cpp
 #include "cmp_movement.h"
 
 MovementComponent::MovementComponent(Entity* parent, sf::Vector2f direction)
@@ -12,7 +13,4 @@ sf::Vector2f MovementComponent::getDirection() const {
     return _direction;
 }
 
-void MovementComponent::update(double dt) {
-    // Optionally, implement any logic here for continuous movement or apply speed
-    // For example, you could multiply the direction by a speed factor and apply time delta (dt)
-}
+void MovementComponent::update(double dt) {}

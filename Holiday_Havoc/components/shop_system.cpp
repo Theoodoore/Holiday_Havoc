@@ -1,3 +1,4 @@
+// shop_system.cpp
 #include "shop_system.h"
 #include "../scenes/scene_level.h"
 #include "../components/cmp_popup.h"
